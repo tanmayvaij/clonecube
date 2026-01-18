@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 
 import { Command } from "commander";
+import { readFileSync } from "fs";
+import { join } from "path";
 
 import {
   cloneGithubRepo,
@@ -10,12 +12,18 @@ import {
 } from "./commands";
 import { ServiceOptions } from "./types";
 
+// Read version from package.json
+// Using relative path from the compiled dist/ directory
+const packageJson = JSON.parse(
+  readFileSync(join(__dirname, "../package.json"), "utf-8")
+);
+
 const program = new Command();
 
 program
   .name("snapcube")
   .description("Clone or recreate project structure")
-  .version("2.0.0");
+  .version(packageJson.version);
 
 /**
  * -------------------------
@@ -33,7 +41,7 @@ program
     try {
       cloneProject(rootPath, options);
     } catch (err: any) {
-      console.error(err.message);
+      console.error(`❌ Failed to clone project "${rootPath}": ${err.message}`);
       process.exit(1);
     }
   });
@@ -64,10 +72,16 @@ program
           await cloneGitlabRepo(repo!, branch!, options);
           break;
         default:
+          console.error(
+            `❌ Unsupported SCM provider: "${scm}". Use "github" or "gitlab".`
+          );
+          process.exit(1);
           break;
       }
     } catch (err: any) {
-      console.error(err.message);
+      console.error(
+        `❌ Failed to clone repository "${repository}": ${err.message}`
+      );
       process.exit(1);
     }
   });
@@ -85,7 +99,9 @@ program
     try {
       createProject(filePath);
     } catch (err: any) {
-      console.error(err.message);
+      console.error(
+        `❌ Failed to create project from "${filePath}": ${err.message}`
+      );
       process.exit(1);
     }
   });

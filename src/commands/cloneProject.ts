@@ -14,24 +14,22 @@ import { ServiceOptions } from "../types";
  *    - token: Reserved for GitHub API use (not used in local scans)
  *    - structureOnly: If true, combine `filePath` + `fileName` into one
  */
-export const cloneProject = (
-  rootPath: string,
-  options?: ServiceOptions
-) => {
+export const cloneProject = (rootPath: string, options?: ServiceOptions) => {
   // Resolve the absolute path and extract just the project folder name
   const projectDirectoryName = basename(resolve(rootPath));
 
-  console.log(`Scanning project: ${projectDirectoryName}`);
+  console.log(`📦 Scanning project: ${projectDirectoryName}`);
 
   // Recursively collect all files and metadata from the project directory
   const files = getProjectFiles(rootPath, options);
 
-  console.log(`Scan complete. Total files: ${files?.length}`);
+  console.log(`✅ Scan complete. Total files: ${files?.length}`);
 
   // Save the snapshot to a JSON file named after the project
+  const outputFile = `${projectDirectoryName}.snapcube.json`;
   writeFileSync(
-    `${projectDirectoryName}.snapcube.json`,
+    outputFile,
     JSON.stringify(files, null, 4) // pretty-print with 4-space indentation
   );
-  console.log("Snapshot saved");
+  console.log(`💾 Snapshot saved to: ${outputFile}`);
 };

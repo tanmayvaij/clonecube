@@ -20,17 +20,18 @@ export const cloneGithubRepo = async (
   // Split "owner/repo" into separate variables
   const [owner, repoName] = repository.split("/");
 
-  console.log(`Scanning project: github:${owner}/${repoName}`);
+  console.log(`📦 Scanning GitHub repository: ${owner}/${repoName}@${branch}`);
 
   // Fetch all files and metadata from the GitHub API
   const files = await getGithubFiles(repository, branch, options);
 
-  console.log(`Scan complete. Total files: ${files?.length}`);
+  console.log(`✅ Scan complete. Total files: ${files?.length}`);
 
   // Save the snapshot to a JSON file named after the repo
+  const outputFile = `${owner}_${repoName}.snapcube.json`;
   writeFileSync(
-    `${owner}_${repoName}.snapcube.json`,
+    outputFile,
     JSON.stringify(files, null, 4) // pretty-print with 4-space indentation
   );
-  console.log("Snapshot saved");
+  console.log(`💾 Snapshot saved to: ${outputFile}`);
 };
